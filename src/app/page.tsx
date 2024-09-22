@@ -36,7 +36,7 @@ export default function Home() {
     <div className="quotes-list">
       <h1>Quotes List</h1>
       <ul>
-        {present.data.map((item: any) => (
+        {present.data.map((item: { id: number; quotes: string }) => (
           <li key={item.id}>{item.quotes}</li>
         ))}
       </ul>
@@ -45,7 +45,7 @@ export default function Home() {
       <button onClick={handleAddItem}>Add Quote</button>
       </div>
       <div className="undo-redo">
-      <button onClick={handleUndo} disabled={past.length === 0}>Undo</button>
+               <button onClick={handleUndo} disabled={past.length === 0}>Undo</button>
       <button onClick={handleRedo} disabled={future.length === 0}>Redo</button>
       </div>
 
