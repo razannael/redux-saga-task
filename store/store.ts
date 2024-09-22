@@ -8,7 +8,7 @@ const sagaMiddleware = createSagaMiddleware();
 const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),
+    getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),// to disable redux-thunk in redux-saga mode (https://github.com/redux-saga/redux-saga/issues/203)
 });
 
 sagaMiddleware.run(rootSaga);

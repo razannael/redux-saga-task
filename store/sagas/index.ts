@@ -1,6 +1,6 @@
 import { all } from 'redux-saga/effects';
-import { watchFetchData } from './dataSaga';
+import { watchFetchData, watchCrudOperations } from './dataSaga';
 
 export function* rootSaga() {
-  yield all([watchFetchData()]);
+  yield all([watchFetchData(), watchCrudOperations()]);
 }

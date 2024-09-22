@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const RedoUndo = () => {
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.example.data);
+  const data = useSelector((state) => state.data.data);
 
   return (
     <div>

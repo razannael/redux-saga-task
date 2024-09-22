@@ -1,37 +1,54 @@
-'use client';
+'use client'; // Ensure this is at the top for client-side rendering
 
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { fetchDataRequest } from '../../store/reducers/dataReducer'; // Import fetch action
 import { RootState } from '../../store/store';
-import { fetchDataRequest } from '../../store/reducers/dataReducer';
-import { undo, redo } from '../../store/reducers/historyReducer';
 
 export default function Home() {
   const dispatch = useDispatch();
-  const { data, loading, error } = useSelector((state: RootState) => state.data);
-  const { past, future } = useSelector((state: RootState) => state.history);
+  const { past, present, future } = useSelector((state: RootState) => state.history.data); // Correct state selection
 
+  // Fetch data on component mount
   useEffect(() => {
-    dispatch(fetchDataRequest());
+    dispatch(fetchDataRequest());  // Dispatch action to fetch data
   }, [dispatch]);
 
+  const handleUndo = () => {
+    if (past.length > 0) {
+      dispatch({ type: 'UNDO' });
+    }
+  };
+
+  const handleRedo = () => {
+    if (future.length > 0) {
+      dispatch({ type: 'REDO' });
+    }
+  };
+
+  const handleAddItem = () => {
+    const inputElement = document.getElementById('input') as HTMLInputElement;
+    const inputValue = inputElement ? inputElement.value : '';
+    dispatch({ type: 'ADD_ITEM', payload: { id: Date.now(), quotes: inputValue } });
+  };
+
   return (
-    <div>
+    <div className="quotes-list">
       <h1>Quotes List</h1>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
       <ul>
-        {data.map((item) => (
-          <li  key={item.id}>{item.quote}</li>
+        {present.data.map((item: any) => (
+          <li key={item.id}>{item.quotes}</li>
         ))}
       </ul>
-{/* 
-      <button onClick={() => dispatch(undo())} disabled={past.length === 0}>
-        Undo
-      </button>
-      <button onClick={() => dispatch(redo())} disabled={future.length === 0}>
-        Redo
-      </button> */}
+      <div className="add-quote">
+      <input id='input' type="text" placeholder="Add Quote" />
+      <button onClick={handleAddItem}>Add Quote</button>
+      </div>
+      <div className="undo-redo">
+      <button onClick={handleUndo} disabled={past.length === 0}>Undo</button>
+      <button onClick={handleRedo} disabled={future.length === 0}>Redo</button>
+      </div>
+
     </div>
   );
 }

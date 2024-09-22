@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+// Data slice remains the same
 interface DataState {
   data: any[];
   loading: boolean;
@@ -28,9 +29,15 @@ const dataSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    addItem(state, action: PayloadAction<any>) {
+      state.data.push(action.payload);
+    },
+    setData(state, action: PayloadAction<any[]>) {
+      state.data = action.payload;
+    },
   },
 });
 
-export const { fetchDataRequest, fetchDataSuccess, fetchDataFailure } = dataSlice.actions;
+export const { fetchDataRequest, fetchDataSuccess, fetchDataFailure, addItem, setData } = dataSlice.actions;
 
 export default dataSlice.reducer;

@@ -1,40 +1,55 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { combineReducers } from '@reduxjs/toolkit';
+import dataReducer from './dataReducer';
 
-interface HistoryState {
-  past: any[];  // Array to store past states
-  present: any; // Current state
-  future: any[]; // Array to store future states
+// Undoable function
+function undoable(reducer: any) {
+  const initialState = {
+    past: [],
+    present: reducer(undefined, {}),
+    future: [],
+  };
+
+  return function (state = initialState, action: any) {
+    const { past, present, future } = state;
+
+    switch (action.type) {
+      case 'UNDO':
+        if (past.length === 0) return state;
+        const previous = past[past.length - 1];
+        const newPast = past.slice(0, past.length - 1);
+        return {
+          past: newPast,
+          present: previous,
+          future: [present, ...future],
+        };
+      case 'REDO':
+        if (future.length === 0) return state;
+        const next = future[0];
+        const newFuture = future.slice(1);
+        return {
+          past: [...past, present],
+          present: next,
+          future: newFuture,
+        };
+      default:
+        // Delegate handling the action to the passed reducer
+        const newPresent = reducer(present, action);
+        if (present === newPresent) {
+          return state; // No change in state
+        }
+        return {
+          past: [...past, present],
+          present: newPresent,
+          future: [], // Clear the future state on new actions
+        };
+    }
+  };
 }
 
-const initialState: HistoryState = {
-  past: [],
-  present: {},
-  future: []
-};
-
-const historySlice = createSlice({
-  name: 'history',
-  initialState,
-  reducers: {
-    addState: (state, action: PayloadAction<any>) => {
-      state.past.push(state.present);
-      state.present = action.payload;
-      state.future = [];
-    },
-    undo: (state) => {
-      if (state.past.length === 0) return;
-      const previous = state.past.pop();
-      state.future.push(state.present);
-      state.present = previous;
-    },
-    redo: (state) => {
-      if (state.future.length === 0) return;
-      const next = state.future.pop();
-      state.past.push(state.present);
-      state.present = next;
-    }
-  }
+// Wrap your data reducer with undoable
+const rootReducer = combineReducers({
+  data: undoable(dataReducer),
+  // Add other reducers here if necessary
 });
 
-export const { addState, undo, redo } = historySlice.actions;
-export default historySlice.reducer;
+export default rootReducer;
